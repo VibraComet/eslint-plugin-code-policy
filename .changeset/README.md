@@ -11,6 +11,7 @@ pnpm changeset
 ```
 
 The CLI will ask you:
+
 1. Which package(s) are affected
 2. Whether it's a `patch` (bug fix), `minor` (new feature), or `major` (breaking change)
 3. A summary of the change

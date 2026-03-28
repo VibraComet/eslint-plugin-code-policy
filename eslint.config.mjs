@@ -28,5 +28,13 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    // Test harness files wire up vitest hooks onto RuleTester via dynamic
+    // property assignment — explicit-any is unavoidable there.
+    files: ['packages/**/tests/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   }
 )

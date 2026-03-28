@@ -108,7 +108,7 @@ pnpm check:all
          recommended: true,
        },
        fixable: undefined, // or 'code' | 'whitespace'
-       schema: [],         // JSON schema for rule options
+       schema: [], // JSON schema for rule options
        messages: {
          myMessageId: 'Error message with {{interpolated}} values.',
        },
@@ -162,9 +162,7 @@ pnpm check:all
    describe('my-new-rule', () => {
      it('passes and fails correctly', () => {
        tester.run('my-new-rule', rule, {
-         valid: [
-           { code: `// code that should NOT trigger the rule` },
-         ],
+         valid: [{ code: `// code that should NOT trigger the rule` }],
          invalid: [
            {
              code: `// code that SHOULD trigger the rule`,
@@ -185,6 +183,7 @@ pnpm check:all
 ## Submitting a Pull Request
 
 1. Fork the repository and create a branch from `main`:
+
    ```bash
    git checkout -b feat/my-new-rule
    ```

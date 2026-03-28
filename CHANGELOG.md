@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - `atomic-file` — enforce exactly one top-level declaration per file
 - `no-inline-types` — enforce that type aliases and interfaces live in their own files
 - `public-api-imports` — prevent deep imports from absolute/alias module paths

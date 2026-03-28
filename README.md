@@ -30,8 +30,8 @@ Modern TypeScript projects — especially those using AI-assisted development �
 
 ## Packages
 
-| Package | Description |
-|---|---|
+| Package                                                             | Description                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------- |
 | [`eslint-plugin-code-policy`](./packages/eslint-plugin-code-policy) | The core ESLint plugin — rules, configs, and TypeScript types |
 
 ---
@@ -49,9 +49,7 @@ In your `eslint.config.mjs`:
 ```js
 import codePolicy from 'eslint-plugin-code-policy'
 
-export default [
-  codePolicy.configs.recommended,
-]
+export default [codePolicy.configs.recommended]
 ```
 
 For Next.js projects:
@@ -59,22 +57,20 @@ For Next.js projects:
 ```js
 import codePolicy from 'eslint-plugin-code-policy'
 
-export default [
-  codePolicy.configs.next,
-]
+export default [codePolicy.configs.next]
 ```
 
 ---
 
 ## Rules
 
-| Rule | Description | Recommended |
-|---|---|:---:|
-| [`atomic-file`](./packages/eslint-plugin-code-policy/docs/rules/atomic-file.md) | Enforce exactly one top-level declaration per file | ✅ |
-| [`no-inline-types`](./packages/eslint-plugin-code-policy/docs/rules/no-inline-types.md) | Enforce that type aliases and interfaces live in their own files | ✅ |
-| [`public-api-imports`](./packages/eslint-plugin-code-policy/docs/rules/public-api-imports.md) | Prevent importing directly from internal module subpaths | ✅ |
-| [`no-cross-module-deep-imports`](./packages/eslint-plugin-code-policy/docs/rules/no-cross-module-deep-imports.md) | Prevent relative imports that bypass another module's public API | ✅ |
-| [`view-logic-separation`](./packages/eslint-plugin-code-policy/docs/rules/view-logic-separation.md) | Prevent state, effects, and inline handlers inside React view components | ✅ |
+| Rule                                                                                                              | Description                                                              | Recommended |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | :---------: |
+| [`atomic-file`](./packages/eslint-plugin-code-policy/docs/rules/atomic-file.md)                                   | Enforce exactly one top-level declaration per file                       |     ✅      |
+| [`no-inline-types`](./packages/eslint-plugin-code-policy/docs/rules/no-inline-types.md)                           | Enforce that type aliases and interfaces live in their own files         |     ✅      |
+| [`public-api-imports`](./packages/eslint-plugin-code-policy/docs/rules/public-api-imports.md)                     | Prevent importing directly from internal module subpaths                 |     ✅      |
+| [`no-cross-module-deep-imports`](./packages/eslint-plugin-code-policy/docs/rules/no-cross-module-deep-imports.md) | Prevent relative imports that bypass another module's public API         |     ✅      |
+| [`view-logic-separation`](./packages/eslint-plugin-code-policy/docs/rules/view-logic-separation.md)               | Prevent state, effects, and inline handlers inside React view components |     ✅      |
 
 ---
 

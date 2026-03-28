@@ -1,0 +1,34 @@
+# eslint-plugin-code-policy
+
+> Architectural linting for TypeScript projects. Enforces atomic files, explicit public APIs, clean runtime boundaries, and framework-safe module structure -- automatically.
+
+## Documentation
+
+- [README](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/README.md): Project overview, quick start, and rule summary table
+- [Plugin README](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/README.md): Full installation, usage, config presets, rule reference with examples
+- [Architecture](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/ARCHITECTURE.md): Internal design, plugin anatomy, how rules and configs work
+- [Contributing](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/CONTRIBUTING.md): Development setup, writing new rules, test workflow, PR checklist
+
+## Rules
+
+- [atomic-file](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/docs/rules/atomic-file.md): Enforce exactly one top-level declaration per file
+- [no-inline-types](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/docs/rules/no-inline-types.md): Enforce that type aliases and interfaces live in their own files
+- [public-api-imports](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/docs/rules/public-api-imports.md): Prevent importing directly from internal module subpaths
+- [no-cross-module-deep-imports](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/docs/rules/no-cross-module-deep-imports.md): Prevent relative imports that bypass another module's public API
+- [view-logic-separation](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/docs/rules/view-logic-separation.md): Prevent state, effects, and inline handlers inside React view components
+
+## Configs
+
+- [recommended](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/src/configs/recommended.ts): All five rules as errors -- best starting point for any TypeScript project
+- [strict](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/src/configs/strict.ts): Extends recommended with maximum enforcement
+- [react](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/src/configs/react.ts): Extends recommended with React-specific adjustments
+- [next](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/src/configs/next.ts): Extends recommended with Next.js App Router support
+
+## Examples
+
+- [Next.js App Router Example](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/examples/nextjs-app/README.md): Working example project with correct and incorrect patterns
+
+## Optional
+
+- [Changelog](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/packages/eslint-plugin-code-policy/CHANGELOG.md): Version history
+- [License](https://github.com/VibraComet/eslint-plugin-code-policy/blob/main/LICENSE): MIT

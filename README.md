@@ -10,6 +10,7 @@ Enforce atomic files, explicit public APIs, clean runtime boundaries, and framew
 [![ESLint](https://img.shields.io/badge/ESLint-v9%2B%20flat%20config-8b5cf6?style=flat-square)](https://eslint.org/docs/latest/use/configure/configuration-files-new)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4%2B-3b82f6?style=flat-square)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-f59e0b?style=flat-square)](https://pnpm.io)
+[![llms.txt](https://img.shields.io/badge/llms.txt-AI%20ready-f59e0b?style=flat-square)](https://vibracomet.github.io/eslint-plugin-code-policy/llms.txt)
 
 </div>
 

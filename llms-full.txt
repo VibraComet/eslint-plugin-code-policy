@@ -1,0 +1,401 @@
+# eslint-plugin-code-policy
+
+> Architectural linting for TypeScript projects. Enforces atomic files, explicit public APIs, clean runtime boundaries, and framework-safe module structure -- automatically.
+
+---
+
+## Overview
+
+`eslint-plugin-code-policy` is an ESLint plugin (v9+ flat config only) that encodes a strict, battle-tested architectural philosophy into lint rules:
+
+- **One exported unit per file.** No helper functions hiding at the bottom. No internal utilities sharing a file with a component.
+- **Public APIs are boundaries, not suggestions.** You cannot bypass a module's index by importing from its internals.
+- **Views are views.** React components cannot own state, effects, or inline handlers -- that logic lives in custom hooks.
+- **Types are not inline.** Every type alias and interface lives in its own dedicated file.
+
+### Requirements
+
+- ESLint `^9.0.0` (flat config)
+- TypeScript `^5.4.0`
+- Node.js `>=20`
+
+---
+
+## Installation
+
+```bash
+npm install --save-dev eslint-plugin-code-policy
+# or
+pnpm add --save-dev eslint-plugin-code-policy
+# or
+yarn add --dev eslint-plugin-code-policy
+```
+
+---
+
+## Usage
+
+### Basic (recommended preset)
+
+```js
+// eslint.config.mjs
+import codePolicy from 'eslint-plugin-code-policy'
+
+export default [codePolicy.configs.recommended]
+```
+
+### Next.js
+
+```js
+// eslint.config.mjs
+import codePolicy from 'eslint-plugin-code-policy'
+
+export default [codePolicy.configs.next]
+```
+
+### Cherry-pick rules
+
+```js
+// eslint.config.mjs
+import codePolicy from 'eslint-plugin-code-policy'
+
+export default [
+  {
+    plugins: { 'code-policy': codePolicy },
+    rules: {
+      'code-policy/atomic-file': 'error',
+      'code-policy/no-inline-types': 'error',
+      'code-policy/public-api-imports': 'error',
+      'code-policy/no-cross-module-deep-imports': 'error',
+      'code-policy/view-logic-separation': 'error',
+    },
+  },
+]
+```
+
+### Config presets
+
+| Preset | Import | Best for |
+|---|---|---|
+| `recommended` | `codePolicy.configs.recommended` | Any TypeScript project |
+| `strict` | `codePolicy.configs.strict` | Maximum enforcement |
+| `react` | `codePolicy.configs.react` | React (Vite, CRA, etc.) |
+| `next` | `codePolicy.configs.next` | Next.js App Router |
+
+All presets enable the same five rules as `error`. `strict`, `react`, and `next` extend `recommended` with framework-specific adjustments (e.g., Next.js reserved exports are exempt from `atomic-file`).
+
+---
+
+## Rules Reference
+
+### code-policy/atomic-file
+
+**Enforce exactly one top-level declaration per file.**
+
+Each file must export exactly one top-level unit -- a function, class, constant, or type.
+
+**Incorrect:**
+
+```ts
+// src/UserUtils.ts -- two exports in one file
+export function formatUserName(user: User) {
+  return `${user.firstName} ${user.lastName}`
+}
+
+export function getUserAge(user: User) {
+  return new Date().getFullYear() - user.birthYear
+}
+```
+
+**Correct:**
+
+```ts
+// src/formatUserName.ts
+export function formatUserName(user: User) {
+  return `${user.firstName} ${user.lastName}`
+}
+```
+
+```ts
+// src/getUserAge.ts
+export function getUserAge(user: User) {
+  return new Date().getFullYear() - user.birthYear
+}
+```
+
+**Automatically skipped:**
+- `*.config.ts` / `*.config.js` / `*.config.mjs` / `*.config.cjs`
+- `index.ts` / `index.tsx` / `index.js` (barrel files)
+- `*.d.ts` (ambient declaration files)
+- Next.js router files: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `route.ts`, `middleware.ts`. Reserved exports (`metadata`, `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`, `config`, `dynamic`, `revalidate`, `fetchCache`, `runtime`, `preferredRegion`, `viewport`, `generateMetadata`, `generateViewport`, `generateStaticParams`) are not counted.
+
+**Options:** None.
+
+---
+
+### code-policy/no-inline-types
+
+**Enforce that type aliases and interfaces live in their own files.**
+
+Type declarations alongside implementation code create hidden coupling. Every `type` or `interface` must be in a dedicated file (ideally inside `types/`).
+
+**Incorrect:**
+
+```ts
+// Mixed type + implementation
+type UserRole = 'admin' | 'member' | 'guest'
+
+export function canEdit(role: UserRole) {
+  return role === 'admin'
+}
+```
+
+**Correct:**
+
+```ts
+// src/types/UserRole.ts
+export type UserRole = 'admin' | 'member' | 'guest'
+```
+
+```ts
+// src/canEdit.ts
+import type { UserRole } from '@/types/UserRole'
+
+export function canEdit(role: UserRole) {
+  return role === 'admin'
+}
+```
+
+**Automatically skipped:**
+- Files inside `types/` or `types/**` directories
+- `*.d.ts` files
+- Pure type files (files containing only imports + type/interface declarations)
+- Next.js reserved exports and route method exports
+
+**Options:** None.
+
+---
+
+### code-policy/public-api-imports
+
+**Prevent importing directly from internal module subpaths.**
+
+Non-relative imports that contain banned subpath segments are flagged. Relative imports are ignored (handled by `no-cross-module-deep-imports`).
+
+**Incorrect:**
+
+```ts
+import { Button } from '@myorg/ui/src/components/Button'
+import { formatDate } from '@myorg/utils/src/date/formatDate'
+```
+
+**Correct:**
+
+```ts
+import { Button } from '@myorg/ui'
+import { formatDate } from '@myorg/utils'
+```
+
+**Options:**
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `bannedSubpaths` | `string[]` | `['/src/']` | Segments that signal a deep internal import |
+
+```js
+'code-policy/public-api-imports': ['error', { bannedSubpaths: ['/src/', '/internal/'] }]
+```
+
+---
+
+### code-policy/no-cross-module-deep-imports
+
+**Prevent relative imports that bypass another module's public API.**
+
+Detects relative imports that traverse up `>=minParentTraversals` directory levels and then descend into an `internalDirs` directory.
+
+**Incorrect:**
+
+```ts
+// packages/ui/src/Button.tsx
+import { helper } from '../../core/src/utils/helper'
+```
+
+**Correct:**
+
+```ts
+import { helper } from '@myorg/core'
+```
+
+**Options:**
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `minParentTraversals` | `number` | `2` | Minimum `../` segments before the rule activates |
+| `internalDirs` | `string[]` | `['src']` | Directory names that signal internal code |
+
+```js
+'code-policy/no-cross-module-deep-imports': ['error', { minParentTraversals: 2, internalDirs: ['src'] }]
+```
+
+---
+
+### code-policy/view-logic-separation
+
+**Prevent state, effects, and inline handlers inside React view components.**
+
+Runs only on `.tsx` files. Flags React hook calls and inline function/handler declarations inside top-level component bodies.
+
+**Incorrect:**
+
+```tsx
+// src/UserCard.tsx -- logic inside a view
+export function UserCard({ userId }: UserCardProps) {
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    fetchUser(userId).then(setUser)
+  }, [userId])
+
+  const handleDelete = () => {
+    deleteUser(userId)
+  }
+
+  return <div onClick={handleDelete}>{user?.name}</div>
+}
+```
+
+**Correct:**
+
+```ts
+// src/useUserCard.ts
+export function useUserCard(userId: string) {
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    fetchUser(userId).then(setUser)
+  }, [userId])
+
+  const handleDelete = () => deleteUser(userId)
+
+  return { user, handleDelete }
+}
+```
+
+```tsx
+// src/UserCard.tsx -- pure view
+import { useUserCard } from './useUserCard'
+
+export function UserCard({ userId }: UserCardProps) {
+  const { user, handleDelete } = useUserCard(userId)
+  return <div onClick={handleDelete}>{user?.name}</div>
+}
+```
+
+**Detected patterns:**
+- Hook calls: `useState`, `useEffect`, `useReducer`, `useCallback`, `useMemo`, `useRef`, `useImperativeHandle`, `useLayoutEffect`, `useDebugValue`, `useDeferredValue`, `useTransition`, `useId`, `useSyncExternalStore`, `useInsertionEffect`, `useQuery`, `useMutation`
+- Inline function declarations (`const handleFoo = () => {}`, `function handleFoo() {}`) inside component bodies
+
+**Options:** None.
+
+---
+
+## Architecture
+
+### Project layout
+
+```
+eslint-plugin-code-policy/
+├── packages/
+│   └── eslint-plugin-code-policy/
+│       ├── src/
+│       │   ├── rules/          # One file per rule (5 rules)
+│       │   ├── configs/        # Shareable flat configs (4 presets)
+│       │   ├── types/          # Shared TypeScript types
+│       │   ├── utils/          # Internal helpers (one per file)
+│       │   └── index.ts        # Plugin entry point
+│       ├── tests/
+│       │   ├── rules/          # Per-rule test suites (vitest + RuleTester)
+│       │   └── fixtures/       # Shared code fixtures
+│       ├── docs/
+│       │   └── rules/          # Per-rule documentation
+│       └── dist/               # Built output (tsup: CJS + ESM)
+├── examples/
+│   └── nextjs-app/             # Working example project
+├── llms.txt                    # AI agent documentation index
+├── ARCHITECTURE.md             # Internal design documentation
+├── CONTRIBUTING.md             # Development and contribution guide
+└── README.md                   # Project overview
+```
+
+### ESLint plugin anatomy
+
+The plugin exports a single object with three keys:
+
+- `meta` -- plugin name and version
+- `rules` -- map of rule names to `Rule.RuleModule` objects
+- `configs` -- map of preset names to flat config objects
+
+Each rule is a standard ESLint `Rule.RuleModule` with `meta` (type, docs, schema, messages) and `create(context)` returning an AST visitor object.
+
+### Config inheritance
+
+```
+recommended (base)
+├── strict    (extends recommended, adds stricter overrides)
+├── react     (extends recommended, adds React-specific adjustments)
+└── next      (extends recommended, adds Next.js App Router support)
+```
+
+### Build pipeline
+
+- **tsup** -- bundles `src/index.ts` + each config file into CJS + ESM
+- **tsc** -- emits `.d.ts` declaration files separately
+- Tests run with **vitest** using ESLint's `RuleTester` API
+
+---
+
+## Contributing Quick Start
+
+```bash
+git clone https://github.com/VibraComet/eslint-plugin-code-policy.git
+cd eslint-plugin-code-policy
+pnpm install
+pnpm build
+pnpm test
+```
+
+### Writing a new rule
+
+1. Create `src/rules/<rule-name>.ts` exporting a single `Rule.RuleModule`
+2. Register in `src/index.ts`
+3. Add to preset configs if recommended by default
+4. Write tests at `tests/rules/<rule-name>.test.ts`
+5. Document at `docs/rules/<rule-name>.md`
+6. Update root README rules table
+
+---
+
+## FAQ
+
+**Q: Why do I get errors on my `index.ts` barrel files?**
+`index.ts` files are automatically exempted from `atomic-file`.
+
+**Q: How do I exempt a specific file?**
+Use ESLint inline disable: `// eslint-disable-next-line code-policy/atomic-file`
+Or add file overrides in `eslint.config.mjs`:
+```js
+{ files: ['src/legacy/**'], rules: { 'code-policy/atomic-file': 'off' } }
+```
+
+**Q: Does this work with JavaScript?**
+Yes. The rules operate at the ESLint AST level. TypeScript-specific nodes are handled gracefully.
+
+**Q: Does it support ESLint v8 / legacy `.eslintrc`?**
+No. This plugin requires ESLint v9+ flat config exclusively.
+
+---
+
+## License
+
+MIT -- Cristian Deluxe

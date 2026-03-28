@@ -55,6 +55,7 @@ jobs:
           title: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # setup-node with registry-url writes .npmrc expecting NODE_AUTH_TOKEN
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           # Enables npm provenance — links the published package to this repo
           NPM_CONFIG_PROVENANCE: "true"

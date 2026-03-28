@@ -8,17 +8,20 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "pnpm -r run build",
+    "changeset": "changeset",
     "check:all": "pnpm lint:fix && pnpm format && pnpm type-check",
     "dev": "pnpm -r run dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,md}\" --list-different",
     "format:check": "prettier --check \"**/*.{ts,js,mjs,json,md}\" --list-different",
+    "release": "pnpm build && changeset publish",
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.12",
     "@eslint/js": "^10.0.1",
     "@types/eslint": "^9.6.1",
     "@types/node": "^25.5.0",

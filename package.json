@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,js,mjs,json,md}\" --list-different",
-    "format:check": "prettier --check \"**/*.{ts,js,mjs,json,md}\" --list-different",
+    "format:check": "prettier --check \"**/*.{ts,js,mjs,json,md}\"",
     "release": "pnpm build && changeset publish",
     "test": "vitest run",
     "test:watch": "vitest",

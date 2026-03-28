@@ -1,0 +1,35 @@
+{
+  "name": "code-policy-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "check:all": "pnpm lint:fix && pnpm format && pnpm type-check",
+    "dev": "pnpm -r run dev",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,js,mjs,json,md}\" --list-different",
+    "format:check": "prettier --check \"**/*.{ts,js,mjs,json,md}\" --list-different",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/eslint": "^9.6.1",
+    "@types/node": "^25.5.0",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.57.2",
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
+  }
+}

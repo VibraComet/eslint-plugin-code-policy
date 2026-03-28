@@ -1,10 +1,11 @@
 ---
-"eslint-plugin-code-policy": minor
+'eslint-plugin-code-policy': minor
 ---
 
 Initial public release of `eslint-plugin-code-policy`.
 
 Introduces architectural linting for TypeScript projects:
+
 - `atomic-file` — enforce one exported symbol per file
 - `explicit-barrel-exports` — require explicit re-exports in index files
 - `no-cross-module-imports` — prevent direct cross-module imports

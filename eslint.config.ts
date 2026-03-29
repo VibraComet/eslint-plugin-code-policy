@@ -1,8 +1,9 @@
 import eslint from '@eslint/js'
-import tseslint from 'typescript-eslint'
 import prettierConfig from 'eslint-config-prettier'
+import { defineConfig } from 'eslint/config'
+import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig([
   // ── Core presets (strictest possible) ──────────────
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
@@ -11,7 +12,7 @@ export default tseslint.config(
 
   // ── Global ignores ─────────────────────────────────
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**', 'eslint.config.ts'],
   },
 
   // ── Source code (strictest) ────────────────────────
@@ -131,7 +132,7 @@ export default tseslint.config(
 
   // ── Config/script files (no type info available) ───
   {
-    files: ['*.mjs', '*.js', '**/*.mjs', '**/*.js'],
+    files: ['**/*.mjs', '**/*.js'],
     ...tseslint.configs.disableTypeChecked,
-  }
-)
+  },
+])

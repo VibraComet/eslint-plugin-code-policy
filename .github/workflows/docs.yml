@@ -33,30 +33,7 @@ jobs:
           touch _site/.nojekyll
           cp llms.txt _site/llms.txt
           cp llms-full.txt _site/llms-full.txt
-
-          # Convert README.md to a styled HTML page
-          npm install --no-save marked@15 2>/dev/null
-          node -e "
-            const { marked } = require('marked');
-            const fs = require('fs');
-            const md = fs.readFileSync('README.md', 'utf8');
-            const body = marked.parse(md);
-            const html = \`<!DOCTYPE html>
-          <html lang=\"en\">
-          <head>
-            <meta charset=\"utf-8\">
-            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
-            <title>eslint-plugin-code-policy</title>
-            <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown-dark.min.css\">
-            <style>
-              body { max-width: 980px; margin: 0 auto; padding: 2rem; background: #0d1117; }
-              .markdown-body { font-size: 16px; }
-            </style>
-          </head>
-          <body class=\"markdown-body\">\${body}</body>
-          </html>\`;
-            fs.writeFileSync('_site/index.html', html);
-          "
+          npx -y marked@15 --gfm < README.md | node scripts/build-docs.cjs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

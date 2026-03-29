@@ -4,10 +4,28 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
+
+    /* ── Strict mode ─────────────────────────────────── */
     "strict": true,
-    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* ── Unused code detection ───────────────────────── */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* ── Module & interop ────────────────────────────── */
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    /* ── Build safety ────────────────────────────────── */
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true
   }
 }

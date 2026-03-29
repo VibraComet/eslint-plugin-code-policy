@@ -34,6 +34,7 @@ export default defineConfig(
       '**/node_modules/**',
       '**/coverage/**',
       'examples/**',
+      'scripts/**',
       'eslint.config.ts',
       'vitest.config.ts',
     ],

@@ -1,6 +1,10 @@
 import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import { defineConfig } from 'eslint/config'
+import importX from 'eslint-plugin-import-x'
+import sonarjs from 'eslint-plugin-sonarjs'
+import unicorn from 'eslint-plugin-unicorn'
+import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
@@ -8,6 +12,11 @@ export default defineConfig([
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+
+  // ── SonarJS recommended (code smell detection) ────
+  sonarjs.configs.recommended,
+
+  // ── Prettier (must be last preset) ────────────────
   prettierConfig,
 
   // ── Global ignores ─────────────────────────────────
@@ -24,17 +33,20 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    plugins: {
+      'import-x': importX,
+      'unused-imports': unusedImports,
+      unicorn,
+    },
+    settings: {
+      'import-x/resolver': {
+        typescript: true,
+      },
+    },
     rules: {
       // ── Correctness ─────────────────────────────────
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': 'off', // delegated to unused-imports
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-unnecessary-condition': 'error',
       '@typescript-eslint/no-unsafe-argument': 'error',
@@ -89,10 +101,71 @@ export default defineConfig([
       'prefer-const': 'error',
       'no-console': 'warn',
       'no-debugger': 'error',
-      'no-duplicate-imports': 'off', // handled by consistent-type-imports
+      'no-duplicate-imports': 'off', // handled by import-x/no-duplicates
       curly: ['error', 'multi-line'],
       'no-throw-literal': 'off', // handled by @typescript-eslint
       '@typescript-eslint/only-throw-error': 'error',
+
+      // ── Unused imports (auto-fixable) ───────────────
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+
+      // ── Import hygiene (import-x) ───────────────────
+      'import-x/first': 'error',
+      'import-x/newline-after-import': 'error',
+      'import-x/no-duplicates': 'error',
+      'import-x/no-cycle': ['error', { maxDepth: 2 }],
+      'import-x/no-self-import': 'error',
+
+      // ── Unicorn (curated best practices) ────────────
+      'unicorn/no-abusive-eslint-disable': 'error',
+      'unicorn/prefer-node-protocol': 'error',
+      'unicorn/prefer-optional-catch-binding': 'error',
+      'unicorn/no-useless-spread': 'error',
+      'unicorn/no-useless-undefined': 'error',
+      'unicorn/prefer-array-flat-map': 'error',
+      'unicorn/no-lonely-if': 'error',
+      'unicorn/prefer-string-replace-all': 'error',
+      'unicorn/no-for-loop': 'error',
+      'unicorn/prefer-includes': 'error',
+      'unicorn/prefer-string-starts-ends-with': 'error',
+      'unicorn/throw-new-error': 'error',
+      'unicorn/filename-case': ['error', { cases: { kebabCase: true } }],
+
+      // ── SonarJS overrides (disable overlaps) ────────
+      'sonarjs/class-name': 'off', // handled by @typescript-eslint/naming-convention
+      'sonarjs/no-fallthrough': 'off', // handled by core no-fallthrough
+      'sonarjs/unused-import': 'off', // handled by unused-imports plugin
+      'sonarjs/no-unused-vars': 'off', // handled by unused-imports plugin
+      'sonarjs/no-dead-store': 'off', // handled by unused-imports plugin
+      'sonarjs/fixme-tag': 'warn', // downgrade to warn (useful during dev)
+      'sonarjs/todo-tag': 'warn', // downgrade to warn (useful during dev)
+      'sonarjs/cognitive-complexity': ['error', 10], // maximum strictness
+      'sonarjs/no-nested-conditional': 'error',
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-duplicated-branches': 'error',
+      'sonarjs/no-identical-expressions': 'error',
+      'sonarjs/no-redundant-boolean': 'error',
+      'sonarjs/prefer-single-boolean-return': 'error',
+      'sonarjs/no-inverted-boolean-check': 'error',
+      'sonarjs/no-redundant-jump': 'error',
+      'sonarjs/no-all-duplicated-branches': 'error',
+      'sonarjs/no-element-overwrite': 'error',
+      'sonarjs/no-empty-collection': 'error',
+      'sonarjs/no-unused-collection': 'error',
+      'sonarjs/no-use-of-empty-return-value': 'error',
+      'sonarjs/no-collection-size-mischeck': 'error',
+      'sonarjs/no-gratuitous-expressions': 'error',
+      'sonarjs/no-nested-functions': 'off', // conflicts with ESLint rule factories
     },
   },
 
@@ -101,8 +174,8 @@ export default defineConfig([
     files: [
       'packages/**/src/rules/**/*.ts',
       'packages/**/src/configs/**/*.ts',
-      'packages/**/src/utils/isComponentNode.ts',
-      'packages/**/src/utils/getEnclosingComponent.ts',
+      'packages/**/src/utils/is-component-node.ts',
+      'packages/**/src/utils/get-enclosing-component.ts',
     ],
     rules: {
       '@typescript-eslint/no-unsafe-argument': 'off',
@@ -112,6 +185,9 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
+      'sonarjs/cognitive-complexity': 'off', // AST visitors are inherently complex
+      'sonarjs/no-nested-conditional': 'off', // AST node type narrowing requires nesting
+      'sonarjs/different-types-comparison': 'off', // AST node types are dynamically typed
     },
   },
 
@@ -127,6 +203,9 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      'sonarjs/no-hardcoded-passwords': 'off',
+      'sonarjs/no-hardcoded-secrets': 'off',
+      'sonarjs/cognitive-complexity': 'off',
     },
   },
 

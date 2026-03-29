@@ -33,6 +33,7 @@ export default defineConfig(
       '**/dist/**',
       '**/node_modules/**',
       '**/coverage/**',
+      'examples/**',
       'eslint.config.ts',
       'vitest.config.ts',
     ],
@@ -40,7 +41,7 @@ export default defineConfig(
 
   // ── Source code (strictest) ────────────────────────
   {
-    files: ['packages/**/*.ts', 'examples/**/*.ts'],
+    files: ['packages/**/*.ts'],
     languageOptions: {
       parserOptions: {
         projectService: true,

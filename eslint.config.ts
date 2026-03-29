@@ -1,3 +1,5 @@
+import type { Linter } from 'eslint'
+
 import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import { defineConfig } from 'eslint/config'
@@ -7,17 +9,23 @@ import unicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
 import tseslint from 'typescript-eslint'
 
-export default defineConfig([
+// Third-party plugins whose type declarations include LegacyConfigObject but
+// emit valid flat config objects at runtime. The cast is safe and recommended
+// by the typescript-eslint migration guide (see #10899).
+const sonarjsRecommended = sonarjs.configs!.recommended! as unknown as Linter.Config
+const prettier = prettierConfig as unknown as Linter.Config
+
+export default defineConfig(
   // ── Core presets (strictest possible) ──────────────
   eslint.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
+  tseslint.configs.strictTypeChecked,
+  tseslint.configs.stylisticTypeChecked,
 
   // ── SonarJS recommended (code smell detection) ────
-  sonarjs.configs.recommended,
+  sonarjsRecommended,
 
   // ── Prettier (must be last preset) ────────────────
-  prettierConfig,
+  prettier,
 
   // ── Global ignores ─────────────────────────────────
   {
@@ -218,6 +226,6 @@ export default defineConfig([
   // ── Config/script files (no type info available) ───
   {
     files: ['**/*.mjs', '**/*.js'],
-    ...tseslint.configs.disableTypeChecked,
-  },
-])
+    extends: [tseslint.configs.disableTypeChecked],
+  }
+)

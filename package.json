@@ -35,6 +35,7 @@
     "globals": "^17.4.0",
     "jiti": "^2.6.1",
     "prettier": "^3.8.1",
+    "tsc-alias": "^1.8.16",
     "tsup": "^8.5.1",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.57.2",

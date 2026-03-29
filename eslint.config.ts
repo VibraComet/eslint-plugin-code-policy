@@ -21,7 +21,13 @@ export default defineConfig([
 
   // ── Global ignores ─────────────────────────────────
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/coverage/**', 'eslint.config.ts'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/coverage/**',
+      'eslint.config.ts',
+      'vitest.config.ts',
+    ],
   },
 
   // ── Source code (strictest) ────────────────────────
